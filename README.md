@@ -36,7 +36,7 @@ The `Select Crop` parameter switches everything between all millets and one mill
 
 - `india_millets.twbx`: the workbook. The data is packaged inside, so it opens in Tableau Public directly.
 - `cereals_clean.csv`: the cleaned data.
-- `fetch_data.py`, `prepare.py`, `analysis.py`: download, clean and analyse the data, run in that order after `pip install -r requirements.txt`.
+- `fetch_data.py`, `prepare.py`, `analysis.py`: download, clean and analyse the data, run in that order after `pip install -r requirements.txt`. `truststore` is in the requirements only because the DES site's certificate failed on my Windows machine without it.
 - `screenshots/`: both dashboards, and the Overview with jowar selected.
 
 ## Limits
