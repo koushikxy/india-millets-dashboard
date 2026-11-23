@@ -2,6 +2,8 @@
 
 2023 was the International Year of Millets, and jowar, bajra and ragi were suddenly everywhere. I wanted to know what had actually happened to millet farming in India before that, so I built a Tableau dashboard from the Ministry of Agriculture's district-level crop statistics, covering 1997-98 to 2022-23 (743 districts, 8 cereal crops).
 
+You can open the live dashboard on [Tableau Public](https://public.tableau.com/app/profile/koushik.maity/viz/india_millets/Overview).
+
 ![Overview](screenshots/overview.png)
 
 ## What I found
