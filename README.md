@@ -22,22 +22,24 @@ The data comes from the [Area, Production & Yield report](https://data.desagri.g
 
 The raw report needed a lot of cleaning. It is a pivot table, with crop, season and measure in three header rows and state and district as merged cells. There are 676,686 cells in all and 365,413 of them are blank. State and district names have serial numbers in front (`1. Punjab`, `25. Faizabad`), 102 district names are in odd case like `West tripura`, and years are text like `1997 - 1998` and not in order. One crop can also have up to six seasons, so I added the seasons up to get one row per district, year and crop.
 
-Some rows were plain errors. 628 rows have an area but no production, and I dropped them (about 0.02% of all the area). Small millets in Maharashtra for 2010-11 show 4.53 million hectares, about 60 times the usual figure, so I dropped that too, along with 23 rows where the yield is above 15 tonnes per hectare, which isn't possible for these crops. Dadra and Nagar Haveli and Daman and Diu show up under three names because they were merged in 2020, so I used the merged name everywhere, and I counted Ladakh under Jammu and Kashmir for the same reason. Lakshadweep has no data at all.
+Some rows were plain errors. 628 season rows have an area but no production. After adding seasons up, 511 district-year-crop rows still had no production at all, and I dropped those (about 0.02% of all the area). Small millets in Maharashtra for 2010-11 show 4.53 million hectares, about 60 times the usual figure, so I dropped that too, along with 23 rows where the yield is above 15 tonnes per hectare, which isn't possible for these crops. Dadra and Nagar Haveli and Daman and Diu show up under three names because they were merged in 2020, so I used the merged name everywhere, and I counted Ladakh under Jammu and Kashmir for the same reason. Lakshadweep has no data at all.
 
 After `prepare.py` the clean file, `cereals_clean.csv`, has 77,318 rows. `analysis.py` works out every number above from it, and the dashboard shows the same numbers.
 
-## The dashboard
+## How I worked it out
 
-The Overview dashboard has the headline numbers, the area and output trend, millets' share of cereal area and the change for each crop, plus a short summary that updates with the crop you pick. The States dashboard has a map of the change in area, the states ranked by area gained or lost, and a district list. Clicking a state on the map or on the bars filters the district list to that state.
+The comparisons in Tableau use two periods, 1998-2000 and 2020-22, each averaged over three years with fields like `SUM(IF [Period] = '2020-22' THEN [Sel Area] END) / 3`. A `Select Crop` parameter lets the same views show all millets together or one millet at a time.
 
-The `Select Crop` parameter switches everything between all millets and one millet. The period values are calculated fields like `SUM(IF [Period] = '2020-22' THEN [Sel Area] END) / 3`. For each state's share of India I used a FIXED LOD with no dimension, so the all-India total stays the same whatever state is in the view, and the district share uses `{FIXED [state] : ...}` in the same way. The share of cereal area line is a 3-year moving average done with a table calculation, `WINDOW_AVG([Share of Cereal Area], -2, 0)` computed along the crop year.
+A state's share of India's millet area needs the all-India total in a view that is split by state, so I used a FIXED LOD with no dimension for that total, and `{FIXED [state] : ...}` for a district's share of its state. To see whether yield really made up for the lost land, I turned both area and yield into an index with the 1998-2000 average as 100 and put them on one synchronised axis. By 2022-23 area was at 57 and yield at 180. The share of cereal area line is smoothed with a 3-year moving average, `WINDOW_AVG(..., -2, 0)` along the crop year.
+
+To check how concentrated the loss was, I made a set of the five states that lost the most area. For all millets that is Maharashtra, Karnataka, Gujarat, Madhya Pradesh and Telangana, and together they account for 85% of the area lost. I also grouped states into Maharashtra and Karnataka, Rajasthan, and the rest of India. Maharashtra and Karnataka went from 10.4 to 4.4 million hectares (-58%), the rest of India fell 45%, and Rajasthan went up 4%.
 
 ## Files
 
 - `india_millets.twbx`: the workbook. The data is packaged inside, so it opens in Tableau Public directly.
 - `cereals_clean.csv`: the cleaned data.
 - `fetch_data.py`, `prepare.py`, `analysis.py`: download, clean and analyse the data, run in that order after `pip install -r requirements.txt`. `truststore` is in the requirements only because the DES site's certificate failed on my Windows machine without it.
-- `screenshots/`: both dashboards, and the Overview with jowar selected.
+- `screenshots/`: the two dashboards, the Overview with jowar selected, and the States dashboard with Maharashtra clicked.
 
 ## Limits
 

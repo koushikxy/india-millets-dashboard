@@ -47,3 +47,15 @@ show("Millet area and production by year (million)", t.T)
 dist = p[(p.crop_group == "Millets") & (p.period == "2020-2022")].groupby(["state", "district"]).area_ha.sum().div(3)
 print("\nTop millet districts 2020-22 ('000 ha) and share of India:")
 print(pd.concat([dist.nlargest(5) / 1e3, (dist.nlargest(5) / dist.sum()).round(3)], axis=1).to_string())
+
+region = s.groupby(s.index.map(lambda x: "Maharashtra and Karnataka" if x in ("Maharashtra", "Karnataka") else "Rajasthan" if x == "Rajasthan" else "Rest of India"))[["1998-2000", "2020-2022", "change"]].sum()
+region["pct"] = region["change"] / region["1998-2000"]
+show("Millet area by region group ('000 ha)", region)
+
+losers = s.nsmallest(5, "change")
+print("\nBiggest losers set (top 5 by area lost):", list(losers.index), f"share of area lost {losers.change.sum() / lost:.1%}")
+
+base = t.loc[1998:2000].sum() / 3
+idx = pd.DataFrame({"area_index": t.area_ha / base.area_ha * 100,
+                    "yield_index": (t.production_t / t.area_ha) / (base.production_t / base.area_ha) * 100})
+show("Area and yield index, 1998-2000 = 100", idx.loc[[1998, 2000, 2010, 2020, 2021, 2022]].T)
